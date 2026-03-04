@@ -75,7 +75,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   );
   const [latestRate, setLatestRate] = useState(1);
   const [rateLoading, setRateLoading] = useState(false);
-  const initRef = useRef(false);
+  
 
   // Persist
   useEffect(() => { saveToStorage(STORAGE_KEYS.TRANSACTIONS, transactions); }, [transactions]);
