@@ -51,8 +51,9 @@ export async function fetchLatestRate(from: string, to: string): Promise<number>
 export async function fetchHistoricalRates(from: string, to: string, days: number = 365): Promise<void> {
   if (from === to) return;
   
-  // Check if we have recent enough historical data
-  if (Date.now() - cache.historicalTimestamp < HISTORICAL_TTL && Object.keys(cache.historical).length > 30) {
+  const pairKey = `${from}_${to}`;
+  // Re-fetch if different pair or stale
+  if (cache.historicalPair === pairKey && Date.now() - cache.historicalTimestamp < HISTORICAL_TTL && Object.keys(cache.historical).length > 30) {
     return;
   }
 
