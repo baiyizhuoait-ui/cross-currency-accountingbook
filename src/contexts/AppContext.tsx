@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import type { Transaction, Wallet, Category, Platform, ThemeMode } from '@/types';
 import { STORAGE_KEYS, loadFromStorage, saveToStorage } from '@/lib/storage';
 import { DEFAULT_CATEGORIES, DEFAULT_PLATFORMS } from '@/lib/defaults';
