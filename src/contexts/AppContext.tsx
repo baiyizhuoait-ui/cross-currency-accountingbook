@@ -102,10 +102,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, [primaryCurrency, secondaryCurrency]);
 
   useEffect(() => {
-    if (!initRef.current) {
-      initRef.current = true;
-      refreshRates();
-    }
+    refreshRates();
   }, [refreshRates]);
 
   // CRUD

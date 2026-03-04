@@ -79,6 +79,7 @@ export async function fetchHistoricalRates(from: string, to: string, days: numbe
       cache.historical[date][to][from] = 1 / rates[to];
     }
     
+    cache.historicalPair = pairKey;
     cache.historicalTimestamp = Date.now();
     saveCache();
   } catch (e) {
