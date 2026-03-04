@@ -10,6 +10,7 @@ let cache: ExchangeRateCache = loadFromStorage(STORAGE_KEYS.EXCHANGE_RATES, {
   latestTimestamp: 0,
   historical: {},
   historicalTimestamp: 0,
+  historicalPair: '',
 });
 
 function saveCache() {
