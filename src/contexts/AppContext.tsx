@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import type { Transaction, Wallet, Category, Platform, ThemeMode } from '@/types';
 import { STORAGE_KEYS, loadFromStorage, saveToStorage } from '@/lib/storage';
 import { DEFAULT_CATEGORIES, DEFAULT_PLATFORMS } from '@/lib/defaults';
@@ -75,7 +75,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   );
   const [latestRate, setLatestRate] = useState(1);
   const [rateLoading, setRateLoading] = useState(false);
-  const initRef = useRef(false);
+  
 
   // Persist
   useEffect(() => { saveToStorage(STORAGE_KEYS.TRANSACTIONS, transactions); }, [transactions]);
@@ -102,10 +102,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, [primaryCurrency, secondaryCurrency]);
 
   useEffect(() => {
-    if (!initRef.current) {
-      initRef.current = true;
-      refreshRates();
-    }
+    refreshRates();
   }, [refreshRates]);
 
   // CRUD

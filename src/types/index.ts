@@ -39,6 +39,7 @@ export interface ExchangeRateCache {
   latestTimestamp: number;
   historical: Record<string, Record<string, Record<string, number>>>; // date -> from -> to -> rate
   historicalTimestamp: number;
+  historicalPair?: string; // track which pair is cached
 }
 
 export type ThemeMode = 'light' | 'dark';
