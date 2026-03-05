@@ -144,7 +144,7 @@ export default function SettingsModal({ open, onClose }: Props) {
               {[...app.categories].sort((a, b) => a.order - b.order).map((c, idx) => (
                 <div key={c.id} className="flex items-center gap-2 bg-secondary rounded-2xl p-3">
                   <GripVertical className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                  <span className="text-lg">{c.icon}</span>
+                  <CategoryIcon icon={c.icon} color={c.color} size={20} />
                   <span className="flex-1 text-sm text-foreground">{c.name}</span>
                   <div className="w-3 h-3 rounded-full" style={{ backgroundColor: c.color }} />
                   <button onClick={() => moveCategory(idx, -1)} className="text-muted-foreground hover:text-foreground">
