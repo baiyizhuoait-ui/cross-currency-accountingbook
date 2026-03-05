@@ -3,6 +3,7 @@ import { useApp } from '@/contexts/AppContext';
 import { getCurrencySymbol } from '@/lib/currencies';
 import { Trash2, X } from 'lucide-react';
 import AddTransactionModal from '@/components/AddTransactionModal';
+import CategoryIcon from '@/components/CategoryIcon';
 
 type Filter = 'all' | 'expense' | 'income';
 
