@@ -81,10 +81,11 @@ export default function TransactionHall() {
                   <div className="flex items-center gap-3">
                     {/* Category icon */}
                     <div
-                      className="w-10 h-10 rounded-2xl flex items-center justify-center text-lg flex-shrink-0"
+                      className="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0"
                       style={{ backgroundColor: (cat?.color || '#94a3b8') + '20' }}
                     >
-                      {cat?.icon || (t.type === 'income' ? '💰' : '📦')}
+                      <CategoryIcon icon={cat?.icon || (t.type === 'income' ? '💰' : '📦')} color={cat?.color} size={20} />
+                    </div>
                     </div>
 
                     {/* Info */}

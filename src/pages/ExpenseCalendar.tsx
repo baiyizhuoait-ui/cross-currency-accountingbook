@@ -251,7 +251,7 @@ export default function ExpenseCalendar() {
                   const cat = categories.find(c => c.id === t.category);
                   return (
                     <div key={t.id} className="flex items-center gap-3 p-2 rounded-xl bg-secondary/50">
-                      <span className="text-lg">{cat?.icon || '📦'}</span>
+                      <CategoryIcon icon={cat?.icon || '📦'} color={cat?.color} size={18} />
                       <span className="flex-1 text-sm text-foreground">{cat?.name || t.category}</span>
                       <span className="text-sm font-medium text-expense">
                         -{getCurrencySymbol(t.currency)}{t.amount.toFixed(2)}
