@@ -172,6 +172,81 @@ export default function SettingsModal({ open, onClose }: Props) {
         </div>
       </div>
 
+      {/* iOS-style Currency Picker Overlay */}
+      {currencyPicker && (
+        <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center" onClick={() => setCurrencyPicker(null)}>
+          <div className="fixed inset-0 bg-foreground/30 backdrop-blur-sm modal-overlay" />
+          <div
+            className="relative w-full sm:max-w-sm max-h-[75vh] flex flex-col glass-card rounded-t-3xl sm:rounded-3xl modal-content overflow-hidden"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-5 pt-5 pb-3">
+              <h3 className="text-base font-semibold text-foreground">
+                {currencyPicker === 'primary' ? '选择主要货币' : '选择次要货币'}
+              </h3>
+              <button onClick={() => setCurrencyPicker(null)} className="p-1.5 rounded-xl hover:bg-secondary transition-colors">
+                <X className="w-5 h-5 text-muted-foreground" />
+              </button>
+            </div>
+            <div className="px-5 pb-3">
+              <div className="flex items-center gap-2 bg-secondary/80 rounded-xl px-3 py-2.5">
+                <Search className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                <input
+                  type="text"
+                  value={currencySearch}
+                  onChange={e => setCurrencySearch(e.target.value)}
+                  placeholder="搜索货币..."
+                  className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+                />
+              </div>
+            </div>
+            <div className="flex-1 overflow-y-auto px-5 pb-5">
+              <div className="rounded-2xl overflow-hidden bg-secondary/50 backdrop-blur-md">
+                {SUPPORTED_CURRENCIES
+                  .filter(c => {
+                    if (!currencySearch) return true;
+                    const q = currencySearch.toLowerCase();
+                    return c.code.toLowerCase().includes(q) || c.name.toLowerCase().includes(q) || c.nameZh.includes(q);
+                  })
+                  .map((c, i, arr) => {
+                    const currentValue = currencyPicker === 'primary' ? app.primaryCurrency : app.secondaryCurrency;
+                    const isSelected = c.code === currentValue;
+                    return (
+                      <button
+                        key={c.code}
+                        onClick={() => {
+                          const otherValue = currencyPicker === 'primary' ? app.secondaryCurrency : app.primaryCurrency;
+                          if (c.code === otherValue) {
+                            toast.error('主要货币与次要货币不能相同', { description: `${c.nameZh} (${c.code}) 已被设为${currencyPicker === 'primary' ? '次要' : '主要'}货币` });
+                            return;
+                          }
+                          if (currencyPicker === 'primary') {
+                            app.setPrimaryCurrency(c.code);
+                          } else {
+                            app.setSecondaryCurrency(c.code);
+                          }
+                          app.refreshRates();
+                          setCurrencyPicker(null);
+                        }}
+                        className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-secondary/80 ${
+                          i < arr.length - 1 ? 'border-b border-border/30' : ''
+                        }`}
+                      >
+                        <span className="w-8 text-center text-lg">{c.symbol}</span>
+                        <div className="flex-1 min-w-0">
+                          <span className="text-sm font-medium text-foreground">{c.nameZh}</span>
+                          <span className="text-xs text-muted-foreground ml-2">{c.code}</span>
+                        </div>
+                        {isSelected && <Check className="w-4.5 h-4.5 text-primary flex-shrink-0" />}
+                      </button>
+                    );
+                  })}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <AddCategoryModal
         open={showAddCategory}
         onClose={() => setShowAddCategory(false)}
