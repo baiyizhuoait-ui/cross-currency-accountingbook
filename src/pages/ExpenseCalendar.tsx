@@ -233,7 +233,8 @@ export default function ExpenseCalendar() {
                 {pieData.map(p => (
                   <div key={p.name} className="flex items-center gap-1.5 text-xs text-muted-foreground">
                     <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: p.color }} />
-                    <span>{p.icon} {p.name} {getCurrencySymbol(chartCurrency)}{p.value}</span>
+                    <CategoryIcon icon={p.icon} color={p.color} size={12} />
+                    <span>{p.name} {getCurrencySymbol(chartCurrency)}{p.value}</span>
                   </div>
                 ))}
               </div>
