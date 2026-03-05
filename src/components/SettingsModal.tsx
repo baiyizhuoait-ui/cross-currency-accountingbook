@@ -13,6 +13,7 @@ interface Props {
 }
 
 type SettingsTab = 'general' | 'platforms' | 'categories';
+type CurrencyPickerTarget = 'primary' | 'secondary' | null;
 
 export default function SettingsModal({ open, onClose }: Props) {
   const app = useApp();
