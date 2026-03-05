@@ -94,28 +94,24 @@ export default function SettingsModal({ open, onClose }: Props) {
 
               <div>
                 <label className="text-sm font-medium text-foreground mb-2 block">主要货币</label>
-                <select
-                  value={app.primaryCurrency}
-                  onChange={e => { app.setPrimaryCurrency(e.target.value); app.refreshRates(); }}
-                  className="w-full bg-secondary text-foreground rounded-xl px-3 py-2.5 text-sm outline-none"
+                <button
+                  onClick={() => { setCurrencyPicker('primary'); setCurrencySearch(''); }}
+                  className="w-full flex items-center justify-between bg-secondary text-foreground rounded-2xl px-4 py-3 text-sm hover:bg-secondary/80 transition-colors"
                 >
-                  {SUPPORTED_CURRENCIES.map(c => (
-                    <option key={c.code} value={c.code}>{c.symbol} {c.code} - {c.nameZh}</option>
-                  ))}
-                </select>
+                  <span>{SUPPORTED_CURRENCIES.find(c => c.code === app.primaryCurrency)?.symbol} {app.primaryCurrency} - {SUPPORTED_CURRENCIES.find(c => c.code === app.primaryCurrency)?.nameZh}</span>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                </button>
               </div>
 
               <div>
                 <label className="text-sm font-medium text-foreground mb-2 block">次要货币</label>
-                <select
-                  value={app.secondaryCurrency}
-                  onChange={e => { app.setSecondaryCurrency(e.target.value); app.refreshRates(); }}
-                  className="w-full bg-secondary text-foreground rounded-xl px-3 py-2.5 text-sm outline-none"
+                <button
+                  onClick={() => { setCurrencyPicker('secondary'); setCurrencySearch(''); }}
+                  className="w-full flex items-center justify-between bg-secondary text-foreground rounded-2xl px-4 py-3 text-sm hover:bg-secondary/80 transition-colors"
                 >
-                  {SUPPORTED_CURRENCIES.map(c => (
-                    <option key={c.code} value={c.code}>{c.symbol} {c.code} - {c.nameZh}</option>
-                  ))}
-                </select>
+                  <span>{SUPPORTED_CURRENCIES.find(c => c.code === app.secondaryCurrency)?.symbol} {app.secondaryCurrency} - {SUPPORTED_CURRENCIES.find(c => c.code === app.secondaryCurrency)?.nameZh}</span>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                </button>
               </div>
             </div>
           )}
