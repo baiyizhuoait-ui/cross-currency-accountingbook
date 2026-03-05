@@ -86,7 +86,6 @@ export default function TransactionHall() {
                     >
                       <CategoryIcon icon={cat?.icon || (t.type === 'income' ? '💰' : '📦')} color={cat?.color} size={20} />
                     </div>
-                    </div>
 
                     {/* Info */}
                     <div className="flex-1 min-w-0">
