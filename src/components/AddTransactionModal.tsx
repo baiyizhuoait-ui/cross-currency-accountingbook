@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import type { Transaction } from '@/types';
 import { getCurrencySymbol } from '@/lib/currencies';
+import CategoryIcon from '@/components/CategoryIcon';
 
 interface Props {
   open: boolean;
