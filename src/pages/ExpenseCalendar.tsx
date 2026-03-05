@@ -4,6 +4,7 @@ import { getCurrencySymbol } from '@/lib/currencies';
 import { getHistoricalRate } from '@/lib/exchangeRates';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import CategoryIcon from '@/components/CategoryIcon';
 
 export default function ExpenseCalendar() {
   const { transactions, categories, primaryCurrency, secondaryCurrency } = useApp();
