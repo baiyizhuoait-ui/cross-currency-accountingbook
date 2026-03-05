@@ -4,6 +4,7 @@ import { getCurrencySymbol } from '@/lib/currencies';
 import { getHistoricalRate } from '@/lib/exchangeRates';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import CategoryIcon from '@/components/CategoryIcon';
 
 export default function ExpenseCalendar() {
   const { transactions, categories, primaryCurrency, secondaryCurrency } = useApp();
@@ -45,7 +46,7 @@ export default function ExpenseCalendar() {
     return totals;
   }, [expenseTransactions, year, month, daysInMonth, currencies]);
 
-  // Bar chart data - daily totals converted to chartCurrency using historical rates
+  // Bar chart data - all days of the month (fixed x-axis)
   const barData = useMemo(() => {
     const data: { day: number; amount: number; date: string }[] = [];
     for (let d = 1; d <= daysInMonth; d++) {
@@ -60,7 +61,7 @@ export default function ExpenseCalendar() {
           total += tx.amount * rate;
         }
       }
-      if (total > 0) data.push({ day: d, amount: parseFloat(total.toFixed(2)), date: dateStr });
+      data.push({ day: d, amount: parseFloat(total.toFixed(2)), date: dateStr });
     }
     return data;
   }, [expenseTransactions, daysInMonth, year, month, chartCurrency]);
@@ -232,7 +233,8 @@ export default function ExpenseCalendar() {
                 {pieData.map(p => (
                   <div key={p.name} className="flex items-center gap-1.5 text-xs text-muted-foreground">
                     <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: p.color }} />
-                    <span>{p.icon} {p.name} {getCurrencySymbol(chartCurrency)}{p.value}</span>
+                    <CategoryIcon icon={p.icon} color={p.color} size={12} />
+                    <span>{p.name} {getCurrencySymbol(chartCurrency)}{p.value}</span>
                   </div>
                 ))}
               </div>
@@ -250,7 +252,7 @@ export default function ExpenseCalendar() {
                   const cat = categories.find(c => c.id === t.category);
                   return (
                     <div key={t.id} className="flex items-center gap-3 p-2 rounded-xl bg-secondary/50">
-                      <span className="text-lg">{cat?.icon || '📦'}</span>
+                      <CategoryIcon icon={cat?.icon || '📦'} color={cat?.color} size={18} />
                       <span className="flex-1 text-sm text-foreground">{cat?.name || t.category}</span>
                       <span className="text-sm font-medium text-expense">
                         -{getCurrencySymbol(t.currency)}{t.amount.toFixed(2)}

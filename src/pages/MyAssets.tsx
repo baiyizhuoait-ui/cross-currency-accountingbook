@@ -1,8 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
-import { getCurrencySymbol, formatAmount } from '@/lib/currencies';
-import { fetchLatestRate, getLatestCachedRate } from '@/lib/exchangeRates';
+import { getCurrencySymbol } from '@/lib/currencies';
 import { Plus, ChevronLeft, ChevronRight, Trash2, Settings } from 'lucide-react';
+
+const WALLET_COLORS = [
+  '#3b82f6', '#f97316', '#ec4899', '#8b5cf6', '#06b6d4',
+  '#ef4444', '#14b8a6', '#a3e635', '#6366f1', '#f43f5e',
+  '#fbbf24', '#78716c', '#1677ff', '#07c160', '#0ea5e9',
+  '#d946ef', '#f59e0b', '#10b981', '#64748b', '#be123c',
+];
 
 export default function MyAssets() {
   const { wallets, transactions, primaryCurrency, secondaryCurrency, latestRate, addWallet, deleteWallet, reorderWallets } = useApp();
@@ -13,14 +19,12 @@ export default function MyAssets() {
 
   const currencies = [primaryCurrency, secondaryCurrency];
 
-  // Calculate dynamic balance for each wallet
   const getWalletBalance = (walletId: string, walletCurrency: string, initialBalance: number) => {
     const walletTxs = transactions.filter(t => t.walletId === walletId);
     let balance = initialBalance;
     for (const t of walletTxs) {
       let amount = t.amount;
       if (t.currency !== walletCurrency) {
-        // Convert using latest rate
         const rate = t.currency === primaryCurrency
           ? (walletCurrency === secondaryCurrency ? latestRate : 1 / latestRate)
           : (walletCurrency === primaryCurrency ? 1 / latestRate : latestRate);
@@ -32,7 +36,6 @@ export default function MyAssets() {
     return balance;
   };
 
-  // Convert to display currency
   const convertToDisplay = (amount: number, fromCurrency: string) => {
     if (fromCurrency === displayCurrency) return amount;
     if (fromCurrency === primaryCurrency && displayCurrency === secondaryCurrency) return amount * latestRate;
@@ -119,12 +122,10 @@ export default function MyAssets() {
               className="glass-card relative overflow-hidden"
               style={{ borderColor: w.color + '30' }}
             >
-              {/* Glow accent */}
               <div
                 className="absolute top-0 right-0 w-24 h-24 rounded-full blur-3xl opacity-20"
                 style={{ backgroundColor: w.color }}
               />
-
               <div className="relative">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-3 h-3 rounded-full" style={{ backgroundColor: w.color }} />
@@ -134,7 +135,6 @@ export default function MyAssets() {
                 <div className="text-xl font-bold text-foreground">
                   {getCurrencySymbol(w.currency)}{balance.toFixed(2)}
                 </div>
-
                 {managing && (
                   <div className="flex gap-2 mt-3">
                     <button onClick={() => moveWallet(idx, -1)} className="p-1.5 rounded-lg bg-secondary text-muted-foreground hover:text-foreground">
@@ -170,22 +170,30 @@ export default function MyAssets() {
               placeholder="钱包名称"
               className="w-full bg-secondary text-foreground rounded-xl px-3 py-2 text-sm outline-none placeholder:text-muted-foreground"
             />
-            <div className="grid grid-cols-2 gap-2">
-              <select
-                value={newWallet.currency}
-                onChange={e => setNewWallet({ ...newWallet, currency: e.target.value })}
-                className="bg-secondary text-foreground rounded-xl px-3 py-2 text-sm outline-none"
-              >
-                {currencies.map(c => (
-                  <option key={c} value={c}>{c}</option>
+            <select
+              value={newWallet.currency}
+              onChange={e => setNewWallet({ ...newWallet, currency: e.target.value })}
+              className="w-full bg-secondary text-foreground rounded-xl px-3 py-2 text-sm outline-none"
+            >
+              {currencies.map(c => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+            {/* Color selection */}
+            <div>
+              <label className="text-xs text-muted-foreground mb-1.5 block">选择颜色</label>
+              <div className="flex flex-wrap gap-1.5">
+                {WALLET_COLORS.map(c => (
+                  <button
+                    key={c}
+                    onClick={() => setNewWallet({ ...newWallet, color: c })}
+                    className={`w-7 h-7 rounded-full transition-all ${
+                      newWallet.color === c ? 'ring-2 ring-offset-2 ring-primary scale-110' : 'hover:scale-105'
+                    }`}
+                    style={{ backgroundColor: c }}
+                  />
                 ))}
-              </select>
-              <input
-                type="color"
-                value={newWallet.color}
-                onChange={e => setNewWallet({ ...newWallet, color: e.target.value })}
-                className="w-full h-9 rounded-xl cursor-pointer bg-transparent"
-              />
+              </div>
             </div>
             <input
               type="number"
