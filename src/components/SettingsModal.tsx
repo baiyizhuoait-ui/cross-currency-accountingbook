@@ -20,6 +20,8 @@ export default function SettingsModal({ open, onClose }: Props) {
   const [tab, setTab] = useState<SettingsTab>('general');
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [showAddPlatform, setShowAddPlatform] = useState(false);
+  const [currencyPicker, setCurrencyPicker] = useState<CurrencyPickerTarget>(null);
+  const [currencySearch, setCurrencySearch] = useState('');
 
   if (!open) return null;
 
