@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import CategoryIcon from '@/components/CategoryIcon';
 import { SUPPORTED_CURRENCIES } from '@/lib/currencies';
-import { Sun, Moon, X, Plus, Trash2, ArrowUp, ArrowDown, GripVertical } from 'lucide-react';
+import { Sun, Moon, X, Plus, Trash2, ArrowUp, ArrowDown, GripVertical, Check, ChevronRight, Search } from 'lucide-react';
+import { toast } from 'sonner';
 import AddCategoryModal from './AddCategoryModal';
 import AddPlatformModal from './AddPlatformModal';
 
