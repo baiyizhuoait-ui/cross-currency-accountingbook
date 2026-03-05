@@ -45,7 +45,7 @@ export default function ExpenseCalendar() {
     return totals;
   }, [expenseTransactions, year, month, daysInMonth, currencies]);
 
-  // Bar chart data - daily totals converted to chartCurrency using historical rates
+  // Bar chart data - all days of the month (fixed x-axis)
   const barData = useMemo(() => {
     const data: { day: number; amount: number; date: string }[] = [];
     for (let d = 1; d <= daysInMonth; d++) {
@@ -60,7 +60,7 @@ export default function ExpenseCalendar() {
           total += tx.amount * rate;
         }
       }
-      if (total > 0) data.push({ day: d, amount: parseFloat(total.toFixed(2)), date: dateStr });
+      data.push({ day: d, amount: parseFloat(total.toFixed(2)), date: dateStr });
     }
     return data;
   }, [expenseTransactions, daysInMonth, year, month, chartCurrency]);

@@ -45,9 +45,16 @@ export default function AddTransactionModal({ open, onClose, editTransaction }: 
 
   if (!open) return null;
 
+  const handleAmountChange = (val: string) => {
+    // Prevent negative numbers
+    const num = parseFloat(val);
+    if (val !== '' && num < 0) return;
+    setAmount(val);
+  };
+
   const handleSubmit = () => {
     const amt = parseFloat(amount);
-    if (!amt || !walletId || !platformId || (type === 'expense' && !category)) return;
+    if (!amt || amt < 0 || !walletId || !platformId || (type === 'expense' && !category)) return;
 
     const data = {
       type, amount: amt, currency, walletId, platformId,
@@ -105,16 +112,16 @@ export default function AddTransactionModal({ open, onClose, editTransaction }: 
           </div>
         </div>
 
-        {/* Amount */}
-        <div className="text-center mb-6">
-          <span className="text-muted-foreground text-lg">{getCurrencySymbol(currency)}</span>
+        {/* Amount - symbol on the left of the number */}
+        <div className="flex items-center justify-center gap-2 mb-6">
+          <span className="text-2xl text-muted-foreground">{getCurrencySymbol(currency)}</span>
           <input
             type="number"
             value={amount}
-            onChange={e => setAmount(e.target.value)}
+            onChange={e => handleAmountChange(e.target.value)}
+            min="0"
             placeholder="0.00"
-            className="text-4xl font-bold text-center bg-transparent border-none outline-none w-full text-foreground placeholder:text-muted"
-            autoFocus
+            className="text-4xl font-bold bg-transparent border-none outline-none w-full text-foreground placeholder:text-muted"
           />
         </div>
 
@@ -127,7 +134,6 @@ export default function AddTransactionModal({ open, onClose, editTransaction }: 
               onChange={e => setWalletId(e.target.value)}
               className="w-full bg-secondary text-foreground rounded-xl px-3 py-2.5 text-sm outline-none border-none"
             >
-              <option value="">选择钱包</option>
               {wallets.map(w => (
                 <option key={w.id} value={w.id}>{w.name}</option>
               ))}
@@ -140,7 +146,6 @@ export default function AddTransactionModal({ open, onClose, editTransaction }: 
               onChange={e => setPlatformId(e.target.value)}
               className="w-full bg-secondary text-foreground rounded-xl px-3 py-2.5 text-sm outline-none border-none"
             >
-              <option value="">选择平台</option>
               {platforms.map(p => (
                 <option key={p.id} value={p.id}>{p.name}</option>
               ))}
