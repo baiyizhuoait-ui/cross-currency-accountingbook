@@ -165,7 +165,7 @@ export default function AddTransactionModal({ open, onClose, editTransaction }: 
                   onClick={() => setCategory(c.id)}
                   className={`category-icon-btn ${category === c.id ? 'selected' : ''}`}
                 >
-                  <span className="text-xl">{c.icon}</span>
+                  <CategoryIcon icon={c.icon} color={c.color} size={22} />
                   <span className="text-[10px] text-muted-foreground">{c.name}</span>
                 </button>
               ))}
