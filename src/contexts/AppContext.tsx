@@ -39,7 +39,6 @@ interface AppContextType {
   setPrimaryCurrency: (c: string) => void;
   setSecondaryCurrency: (c: string) => void;
   refreshRates: () => Promise<void>;
-  refreshRates: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | null>(null);
