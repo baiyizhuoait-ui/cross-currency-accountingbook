@@ -19,7 +19,7 @@ export default function AddTransactionModal({ open, onClose, editTransaction }: 
   const [walletId, setWalletId] = useState('');
   const [platformId, setPlatformId] = useState('');
   const [category, setCategory] = useState('');
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState(new Date().toISOString().slice(0, 16));
   const [note, setNote] = useState('');
 
   useEffect(() => {
