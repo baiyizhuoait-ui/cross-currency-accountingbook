@@ -7,6 +7,7 @@ const STORAGE_KEYS = {
   PRIMARY_CURRENCY: 'mcb_primary_currency',
   SECONDARY_CURRENCY: 'mcb_secondary_currency',
   EXCHANGE_RATES: 'mcb_exchange_rates',
+  THEME_COLOR: 'mcb_theme_color',
 } as const;
 
 export function loadFromStorage<T>(key: string, fallback: T): T {

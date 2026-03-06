@@ -45,19 +45,71 @@ export default function TransactionHall() {
       <h2 className="text-2xl font-bold text-foreground mb-5">明细大厅</h2>
 
       {/* Filters */}
-      <div className="flex gap-2 mb-5">
+      <div className="flex gap-2 mb-5 flex-wrap">
         {filters.map(f => (
           <button
             key={f.key}
-            onClick={() => setFilter(f.key)}
+            onClick={() => { setFilter(f.key); setSelectedCategoryId(null); }}
             className={`px-4 py-2 rounded-2xl text-sm font-medium transition-all duration-200 ${
-              filter === f.key ? 'bg-primary text-primary-foreground accent-glow' : 'bg-secondary text-muted-foreground hover:bg-muted'
+              filter === f.key && !selectedCategoryId ? 'bg-primary text-primary-foreground accent-glow' : 'bg-secondary text-muted-foreground hover:bg-muted'
             }`}
           >
             {f.label}
           </button>
         ))}
+        <button
+          onClick={() => setShowCategoryPicker(true)}
+          className={`px-4 py-2 rounded-2xl text-sm font-medium transition-all duration-200 flex items-center gap-1.5 ${
+            selectedCategoryId ? 'bg-primary text-primary-foreground accent-glow' : 'bg-secondary text-muted-foreground hover:bg-muted'
+          }`}
+        >
+          {selectedCategory ? (
+            <>
+              <CategoryIcon icon={selectedCategory.icon} color={selectedCategoryId ? 'currentColor' : selectedCategory.color} size={14} />
+              {selectedCategory.name}
+            </>
+          ) : (
+            <>选择分类 <ChevronDown className="w-3.5 h-3.5" /></>
+          )}
+        </button>
       </div>
+
+      {/* Category Picker Modal */}
+      {showCategoryPicker && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" onClick={() => setShowCategoryPicker(false)}>
+          <div className="fixed inset-0 bg-foreground/20 backdrop-blur-sm modal-overlay" />
+          <div
+            className="relative w-full sm:max-w-sm max-h-[60vh] flex flex-col glass-card rounded-t-3xl sm:rounded-3xl modal-content overflow-hidden"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-semibold text-foreground">选择分类</h3>
+              <button onClick={() => setShowCategoryPicker(false)} className="p-1.5 rounded-xl hover:bg-secondary transition-colors">
+                <X className="w-5 h-5 text-muted-foreground" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto space-y-1">
+              {[...categories].sort((a, b) => a.order - b.order).map(c => (
+                <button
+                  key={c.id}
+                  onClick={() => { setSelectedCategoryId(c.id); setShowCategoryPicker(false); setFilter('all'); }}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left transition-colors ${
+                    selectedCategoryId === c.id ? 'bg-primary/10 ring-1 ring-primary' : 'hover:bg-secondary'
+                  }`}
+                >
+                  <div
+                    className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: (c.color || '#94a3b8') + '20' }}
+                  >
+                    <CategoryIcon icon={c.icon} color={c.color} size={18} />
+                  </div>
+                  <span className="text-sm font-medium text-foreground">{c.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Transaction List */}
       {Object.keys(grouped).length === 0 && (
