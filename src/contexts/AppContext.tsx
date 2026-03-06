@@ -165,6 +165,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const setTheme = useCallback((t: ThemeMode) => setThemeState(t), []);
+  const setThemeColor = useCallback((c: string) => setThemeColorState(c), []);
   const setPrimaryCurrency = useCallback((c: string) => {
     setPrimaryCurrencyState(c);
   }, []);
