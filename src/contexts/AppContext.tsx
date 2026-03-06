@@ -89,6 +89,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => { saveToStorage(STORAGE_KEYS.CATEGORIES, categories); }, [categories]);
   useEffect(() => { saveToStorage(STORAGE_KEYS.PLATFORMS, platforms); }, [platforms]);
   useEffect(() => { saveToStorage(STORAGE_KEYS.THEME, theme); }, [theme]);
+  useEffect(() => { saveToStorage(STORAGE_KEYS.THEME_COLOR, themeColor); }, [themeColor]);
   useEffect(() => { saveToStorage(STORAGE_KEYS.PRIMARY_CURRENCY, primaryCurrency); }, [primaryCurrency]);
   useEffect(() => { saveToStorage(STORAGE_KEYS.SECONDARY_CURRENCY, secondaryCurrency); }, [secondaryCurrency]);
 
