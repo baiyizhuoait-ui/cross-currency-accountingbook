@@ -19,7 +19,7 @@ export default function AddTransactionModal({ open, onClose, editTransaction }: 
   const [walletId, setWalletId] = useState('');
   const [platformId, setPlatformId] = useState('');
   const [category, setCategory] = useState('');
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState(new Date().toISOString().slice(0, 16));
   const [note, setNote] = useState('');
 
   useEffect(() => {
@@ -39,7 +39,7 @@ export default function AddTransactionModal({ open, onClose, editTransaction }: 
       setWalletId(wallets[0]?.id || '');
       setPlatformId(platforms[0]?.id || '');
       setCategory('');
-      setDate(new Date().toISOString().split('T')[0]);
+      setDate(new Date().toISOString().slice(0, 16));
       setNote('');
     }
   }, [editTransaction, open, primaryCurrency, wallets, platforms]);
@@ -174,15 +174,15 @@ export default function AddTransactionModal({ open, onClose, editTransaction }: 
         )}
 
         {/* Date + Note */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <div>
-            <label className="text-xs text-muted-foreground mb-1 block">日期</label>
-            <input
-              type="date"
-              value={date}
-              onChange={e => setDate(e.target.value)}
-              className="w-full bg-secondary text-foreground rounded-xl px-3 py-2.5 text-sm outline-none"
-            />
+         <div className="grid grid-cols-2 gap-3 mb-6">
+           <div>
+             <label className="text-xs text-muted-foreground mb-1 block">时间</label>
+             <input
+               type="datetime-local"
+               value={date}
+               onChange={e => setDate(e.target.value)}
+               className="w-full bg-secondary text-foreground rounded-xl px-3 py-2.5 text-sm outline-none"
+             />
           </div>
           <div>
             <label className="text-xs text-muted-foreground mb-1 block">备注</label>
