@@ -98,6 +98,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     document.documentElement.classList.toggle('dark', theme === 'dark');
   }, [theme]);
 
+  useEffect(() => {
+    if (themeColor === 'blue') {
+      document.documentElement.removeAttribute('data-theme-color');
+    } else {
+      document.documentElement.setAttribute('data-theme-color', themeColor);
+    }
+  }, [themeColor]);
+
   const refreshRates = useCallback(async () => {
     setRateLoading(true);
     try {
