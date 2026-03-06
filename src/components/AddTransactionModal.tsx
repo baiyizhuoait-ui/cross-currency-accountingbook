@@ -174,15 +174,15 @@ export default function AddTransactionModal({ open, onClose, editTransaction }: 
         )}
 
         {/* Date + Note */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <div>
-            <label className="text-xs text-muted-foreground mb-1 block">日期</label>
-            <input
-              type="date"
-              value={date}
-              onChange={e => setDate(e.target.value)}
-              className="w-full bg-secondary text-foreground rounded-xl px-3 py-2.5 text-sm outline-none"
-            />
+         <div className="grid grid-cols-2 gap-3 mb-6">
+           <div>
+             <label className="text-xs text-muted-foreground mb-1 block">时间</label>
+             <input
+               type="datetime-local"
+               value={date}
+               onChange={e => setDate(e.target.value)}
+               className="w-full bg-secondary text-foreground rounded-xl px-3 py-2.5 text-sm outline-none"
+             />
           </div>
           <div>
             <label className="text-xs text-muted-foreground mb-1 block">备注</label>
