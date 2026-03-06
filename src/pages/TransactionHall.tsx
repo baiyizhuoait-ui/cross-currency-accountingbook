@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { getCurrencySymbol } from '@/lib/currencies';
-import { Trash2, X } from 'lucide-react';
+import { Trash2, X, ChevronDown } from 'lucide-react';
 import AddTransactionModal from '@/components/AddTransactionModal';
 import CategoryIcon from '@/components/CategoryIcon';
 
@@ -11,11 +11,16 @@ export default function TransactionHall() {
   const { transactions, categories, platforms, wallets } = useApp();
   const { deleteTransaction } = useApp();
   const [filter, setFilter] = useState<Filter>('all');
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+  const [showCategoryPicker, setShowCategoryPicker] = useState(false);
   const [editTx, setEditTx] = useState<typeof transactions[0] | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
+  const selectedCategory = selectedCategoryId ? categories.find(c => c.id === selectedCategoryId) : null;
+
   const filtered = transactions
     .filter(t => filter === 'all' || t.type === filter)
+    .filter(t => !selectedCategoryId || t.category === selectedCategoryId)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime() || b.createdAt - a.createdAt);
 
   const getCategory = (id: string) => categories.find(c => c.id === id);
