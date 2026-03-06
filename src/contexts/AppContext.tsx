@@ -10,6 +10,7 @@ interface AppContextType {
   categories: Category[];
   platforms: Platform[];
   theme: ThemeMode;
+  themeColor: string;
   primaryCurrency: string;
   secondaryCurrency: string;
   latestRate: number;
@@ -34,6 +35,7 @@ interface AppContextType {
   deletePlatform: (id: string) => void;
 
   setTheme: (t: ThemeMode) => void;
+  setThemeColor: (c: string) => void;
   setPrimaryCurrency: (c: string) => void;
   setSecondaryCurrency: (c: string) => void;
   refreshRates: () => Promise<void>;
@@ -64,6 +66,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [platforms, setPlatforms] = useState<Platform[]>(() =>
     loadFromStorage(STORAGE_KEYS.PLATFORMS, DEFAULT_PLATFORMS)
   );
+  const [themeColor, setThemeColorState] = useState<string>(() =>
+    loadFromStorage(STORAGE_KEYS.THEME_COLOR, 'blue')
+  );
   const [theme, setThemeState] = useState<ThemeMode>(() =>
     loadFromStorage(STORAGE_KEYS.THEME, 'light')
   );
@@ -83,6 +88,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => { saveToStorage(STORAGE_KEYS.CATEGORIES, categories); }, [categories]);
   useEffect(() => { saveToStorage(STORAGE_KEYS.PLATFORMS, platforms); }, [platforms]);
   useEffect(() => { saveToStorage(STORAGE_KEYS.THEME, theme); }, [theme]);
+  useEffect(() => { saveToStorage(STORAGE_KEYS.THEME_COLOR, themeColor); }, [themeColor]);
   useEffect(() => { saveToStorage(STORAGE_KEYS.PRIMARY_CURRENCY, primaryCurrency); }, [primaryCurrency]);
   useEffect(() => { saveToStorage(STORAGE_KEYS.SECONDARY_CURRENCY, secondaryCurrency); }, [secondaryCurrency]);
 
@@ -90,6 +96,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
   }, [theme]);
+
+  useEffect(() => {
+    if (themeColor === 'blue') {
+      document.documentElement.removeAttribute('data-theme-color');
+    } else {
+      document.documentElement.setAttribute('data-theme-color', themeColor);
+    }
+  }, [themeColor]);
 
   const refreshRates = useCallback(async () => {
     setRateLoading(true);
@@ -150,6 +164,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const setTheme = useCallback((t: ThemeMode) => setThemeState(t), []);
+  const setThemeColor = useCallback((c: string) => setThemeColorState(c), []);
   const setPrimaryCurrency = useCallback((c: string) => {
     setPrimaryCurrencyState(c);
   }, []);
@@ -159,13 +174,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AppContext.Provider value={{
-      transactions, wallets, categories, platforms, theme,
+      transactions, wallets, categories, platforms, theme, themeColor,
       primaryCurrency, secondaryCurrency, latestRate, rateLoading,
       addTransaction, updateTransaction, deleteTransaction,
       addWallet, updateWallet, deleteWallet, reorderWallets,
       addCategory, updateCategory, deleteCategory, reorderCategories,
       addPlatform, updatePlatform, deletePlatform,
-      setTheme, setPrimaryCurrency, setSecondaryCurrency, refreshRates,
+      setTheme, setThemeColor, setPrimaryCurrency, setSecondaryCurrency, refreshRates,
     }}>
       {children}
     </AppContext.Provider>
