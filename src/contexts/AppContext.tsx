@@ -35,8 +35,10 @@ interface AppContextType {
   deletePlatform: (id: string) => void;
 
   setTheme: (t: ThemeMode) => void;
+  setThemeColor: (c: string) => void;
   setPrimaryCurrency: (c: string) => void;
   setSecondaryCurrency: (c: string) => void;
+  refreshRates: () => Promise<void>;
   refreshRates: () => Promise<void>;
 }
 
