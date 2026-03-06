@@ -67,6 +67,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [platforms, setPlatforms] = useState<Platform[]>(() =>
     loadFromStorage(STORAGE_KEYS.PLATFORMS, DEFAULT_PLATFORMS)
   );
+  const [themeColor, setThemeColorState] = useState<string>(() =>
+    loadFromStorage(STORAGE_KEYS.THEME_COLOR, 'blue')
+  );
   const [theme, setThemeState] = useState<ThemeMode>(() =>
     loadFromStorage(STORAGE_KEYS.THEME, 'light')
   );
