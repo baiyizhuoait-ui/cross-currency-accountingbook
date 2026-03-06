@@ -10,6 +10,7 @@ interface AppContextType {
   categories: Category[];
   platforms: Platform[];
   theme: ThemeMode;
+  themeColor: string;
   primaryCurrency: string;
   secondaryCurrency: string;
   latestRate: number;
