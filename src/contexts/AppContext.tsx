@@ -175,13 +175,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AppContext.Provider value={{
-      transactions, wallets, categories, platforms, theme,
+      transactions, wallets, categories, platforms, theme, themeColor,
       primaryCurrency, secondaryCurrency, latestRate, rateLoading,
       addTransaction, updateTransaction, deleteTransaction,
       addWallet, updateWallet, deleteWallet, reorderWallets,
       addCategory, updateCategory, deleteCategory, reorderCategories,
       addPlatform, updatePlatform, deletePlatform,
-      setTheme, setPrimaryCurrency, setSecondaryCurrency, refreshRates,
+      setTheme, setThemeColor, setPrimaryCurrency, setSecondaryCurrency, refreshRates,
     }}>
       {children}
     </AppContext.Provider>
