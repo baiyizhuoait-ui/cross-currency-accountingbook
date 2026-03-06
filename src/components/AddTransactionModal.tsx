@@ -39,7 +39,7 @@ export default function AddTransactionModal({ open, onClose, editTransaction }: 
       setWalletId(wallets[0]?.id || '');
       setPlatformId(platforms[0]?.id || '');
       setCategory('');
-      setDate(new Date().toISOString().split('T')[0]);
+      setDate(new Date().toISOString().slice(0, 16));
       setNote('');
     }
   }, [editTransaction, open, primaryCurrency, wallets, platforms]);
