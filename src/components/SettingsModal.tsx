@@ -93,6 +93,40 @@ export default function SettingsModal({ open, onClose }: Props) {
               </div>
 
               <div>
+                <label className="text-sm font-medium text-foreground mb-2 block">主题色</label>
+                <div className="flex gap-2.5 flex-wrap">
+                  {([
+                    { key: 'blue', label: '蓝色', light: '221 83% 53%', dark: '217 91% 60%' },
+                    { key: 'rose', label: '玫红', light: '346 77% 50%', dark: '346 77% 60%' },
+                    { key: 'green', label: '绿色', light: '160 84% 39%', dark: '160 84% 45%' },
+                    { key: 'violet', label: '紫色', light: '263 70% 50%', dark: '263 70% 60%' },
+                    { key: 'amber', label: '琥珀', light: '38 92% 50%', dark: '38 92% 55%' },
+                    { key: 'teal', label: '青色', light: '183 74% 40%', dark: '183 74% 50%' },
+                  ] as const).map(c => {
+                    const isActive = app.themeColor === c.key;
+                    const colorHsl = app.theme === 'dark' ? c.dark : c.light;
+                    return (
+                      <button
+                        key={c.key}
+                        onClick={() => app.setThemeColor(c.key)}
+                        className={`flex flex-col items-center gap-1.5 p-2 rounded-xl transition-all duration-200 ${
+                          isActive ? 'ring-2 ring-offset-2 ring-offset-background' : 'hover:scale-105'
+                        }`}
+                        style={{ ['--tw-ring-color' as string]: `hsl(${colorHsl})` }}
+                        title={c.label}
+                      >
+                        <div
+                          className="w-8 h-8 rounded-full shadow-sm"
+                          style={{ background: `hsl(${colorHsl})` }}
+                        />
+                        <span className="text-[10px] text-muted-foreground">{c.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
                 <label className="text-sm font-medium text-foreground mb-2 block">主要货币</label>
                 <button
                   onClick={() => { setCurrencyPicker('primary'); setCurrencySearch(''); }}
