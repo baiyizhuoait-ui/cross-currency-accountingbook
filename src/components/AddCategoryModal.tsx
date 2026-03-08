@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useApp } from '@/contexts/AppContext';
+import { translations } from '@/lib/i18n';
 import { X } from 'lucide-react';
 import {
   Utensils, Car, ShoppingBag, Home, Gamepad2, HeartPulse, BookOpen, Sparkles, Smartphone, Shirt,
@@ -86,6 +88,8 @@ const COLOR_OPTIONS = [
 ];
 
 export default function AddCategoryModal({ open, onClose, onAdd }: Props) {
+  const { language } = useApp();
+  const lang = translations[language];
   const [name, setName] = useState('');
   const [selectedIcon, setSelectedIcon] = useState('Utensils');
   const [color, setColor] = useState('#3b82f6');
@@ -94,8 +98,6 @@ export default function AddCategoryModal({ open, onClose, onAdd }: Props) {
 
   const handleSubmit = () => {
     if (!name.trim()) return;
-    // Render the icon as a colored SVG reference stored as icon name
-    // We'll use the icon name and render it with the color in the app
     onAdd({ name: name.trim(), icon: selectedIcon, color });
     setName('');
     setSelectedIcon('Utensils');
@@ -112,34 +114,31 @@ export default function AddCategoryModal({ open, onClose, onAdd }: Props) {
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-bold text-foreground">新建分类</h2>
+          <h2 className="text-lg font-bold text-foreground">{lang.newCategory}</h2>
           <button onClick={onClose} className="p-1.5 rounded-xl hover:bg-secondary transition-colors">
             <X className="w-5 h-5 text-muted-foreground" />
           </button>
         </div>
 
-        {/* Preview */}
         <div className="flex items-center justify-center mb-5">
           <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: color + '20' }}>
             <SelectedIconComponent className="w-8 h-8" style={{ color }} />
           </div>
         </div>
 
-        {/* Name */}
         <div className="mb-4">
-          <label className="text-xs text-muted-foreground mb-1 block">分类名称</label>
+          <label className="text-xs text-muted-foreground mb-1 block">{lang.categoryName}</label>
           <input
             value={name}
             onChange={e => setName(e.target.value)}
-            placeholder="输入分类名称"
+            placeholder={lang.categoryNamePlaceholder}
             className="w-full bg-secondary text-foreground rounded-xl px-3 py-2.5 text-sm outline-none placeholder:text-muted-foreground"
             autoFocus
           />
         </div>
 
-        {/* Icon grid */}
         <div className="mb-4">
-          <label className="text-xs text-muted-foreground mb-2 block">选择图标</label>
+          <label className="text-xs text-muted-foreground mb-2 block">{lang.chooseIcon}</label>
           <div className="grid grid-cols-8 gap-1.5 max-h-[180px] overflow-auto">
             {ICON_OPTIONS.map(({ icon: Icon, name: iconName, label }) => (
               <button
@@ -158,9 +157,8 @@ export default function AddCategoryModal({ open, onClose, onAdd }: Props) {
           </div>
         </div>
 
-        {/* Color */}
         <div className="mb-6">
-          <label className="text-xs text-muted-foreground mb-2 block">选择颜色</label>
+          <label className="text-xs text-muted-foreground mb-2 block">{lang.chooseColor}</label>
           <div className="flex flex-wrap gap-2">
             {COLOR_OPTIONS.map(c => (
               <button
@@ -179,12 +177,11 @@ export default function AddCategoryModal({ open, onClose, onAdd }: Props) {
           onClick={handleSubmit}
           className="w-full gradient-primary text-primary-foreground py-3 rounded-2xl font-semibold accent-glow transition-all duration-200 hover:opacity-90"
         >
-          创建分类
+          {lang.createCategory}
         </button>
       </div>
     </div>
   );
 }
 
-// Export the ICON_OPTIONS for use in rendering categories
 export { ICON_OPTIONS };

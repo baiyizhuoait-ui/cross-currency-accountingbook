@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useApp } from '@/contexts/AppContext';
+import { translations } from '@/lib/i18n';
 import { X } from 'lucide-react';
 
 interface Props {
@@ -15,6 +17,8 @@ const COLOR_OPTIONS = [
 ];
 
 export default function AddPlatformModal({ open, onClose, onAdd }: Props) {
+  const { language } = useApp();
+  const lang = translations[language];
   const [name, setName] = useState('');
   const [color, setColor] = useState('#3b82f6');
 
@@ -35,34 +39,31 @@ export default function AddPlatformModal({ open, onClose, onAdd }: Props) {
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-bold text-foreground">添加平台</h2>
+          <h2 className="text-lg font-bold text-foreground">{lang.addPlatformTitle}</h2>
           <button onClick={onClose} className="p-1.5 rounded-xl hover:bg-secondary transition-colors">
             <X className="w-5 h-5 text-muted-foreground" />
           </button>
         </div>
 
-        {/* Preview */}
         <div className="flex items-center justify-center mb-5">
           <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ backgroundColor: color + '20' }}>
             <div className="w-6 h-6 rounded-full" style={{ backgroundColor: color }} />
           </div>
         </div>
 
-        {/* Name */}
         <div className="mb-4">
-          <label className="text-xs text-muted-foreground mb-1 block">平台名称</label>
+          <label className="text-xs text-muted-foreground mb-1 block">{lang.platformName}</label>
           <input
             value={name}
             onChange={e => setName(e.target.value)}
-            placeholder="输入平台名称"
+            placeholder={lang.platformNamePlaceholder}
             className="w-full bg-secondary text-foreground rounded-xl px-3 py-2.5 text-sm outline-none placeholder:text-muted-foreground"
             autoFocus
           />
         </div>
 
-        {/* Color */}
         <div className="mb-6">
-          <label className="text-xs text-muted-foreground mb-2 block">选择颜色</label>
+          <label className="text-xs text-muted-foreground mb-2 block">{lang.chooseColor}</label>
           <div className="flex flex-wrap gap-2">
             {COLOR_OPTIONS.map(c => (
               <button
@@ -81,7 +82,7 @@ export default function AddPlatformModal({ open, onClose, onAdd }: Props) {
           onClick={handleSubmit}
           className="w-full gradient-primary text-primary-foreground py-3 rounded-2xl font-semibold accent-glow transition-all duration-200 hover:opacity-90"
         >
-          添加平台
+          {lang.addPlatformBtn}
         </button>
       </div>
     </div>

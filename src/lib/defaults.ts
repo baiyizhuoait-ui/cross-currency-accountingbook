@@ -19,7 +19,6 @@ export const DEFAULT_CATEGORIES: Category[] = [
 export const DEFAULT_PLATFORMS: Platform[] = [
   { id: 'alipay', name: '支付宝', color: '#1677ff' },
   { id: 'wechat', name: '微信支付', color: '#07c160' },
-  { id: 'tng', name: "Touch 'n Go", color: '#005abb' },
   { id: 'cash', name: '现金', color: '#78716c' },
   { id: 'bank', name: '银行卡', color: '#6366f1' },
 ];

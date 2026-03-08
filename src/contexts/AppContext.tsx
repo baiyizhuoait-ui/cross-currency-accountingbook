@@ -3,6 +3,7 @@ import type { Transaction, Wallet, Category, Platform, ThemeMode } from '@/types
 import { STORAGE_KEYS, loadFromStorage, saveToStorage } from '@/lib/storage';
 import { DEFAULT_CATEGORIES, DEFAULT_PLATFORMS } from '@/lib/defaults';
 import { fetchLatestRate, fetchHistoricalRates } from '@/lib/exchangeRates';
+import type { Language } from '@/lib/i18n';
 
 interface AppContextType {
   transactions: Transaction[];
@@ -15,6 +16,7 @@ interface AppContextType {
   secondaryCurrency: string;
   latestRate: number;
   rateLoading: boolean;
+  language: Language;
 
   addTransaction: (t: Omit<Transaction, 'id' | 'createdAt'>) => void;
   updateTransaction: (t: Transaction) => void;
@@ -38,6 +40,7 @@ interface AppContextType {
   setThemeColor: (c: string) => void;
   setPrimaryCurrency: (c: string) => void;
   setSecondaryCurrency: (c: string) => void;
+  setLanguage: (l: Language) => void;
   refreshRates: () => Promise<void>;
 }
 
@@ -78,9 +81,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [secondaryCurrency, setSecondaryCurrencyState] = useState<string>(() =>
     loadFromStorage(STORAGE_KEYS.SECONDARY_CURRENCY, 'MYR')
   );
+  const [language, setLanguageState] = useState<Language>(() =>
+    loadFromStorage(STORAGE_KEYS.LANGUAGE, 'zh')
+  );
   const [latestRate, setLatestRate] = useState(1);
   const [rateLoading, setRateLoading] = useState(false);
-  
 
   // Persist
   useEffect(() => { saveToStorage(STORAGE_KEYS.TRANSACTIONS, transactions); }, [transactions]);
@@ -91,6 +96,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => { saveToStorage(STORAGE_KEYS.THEME_COLOR, themeColor); }, [themeColor]);
   useEffect(() => { saveToStorage(STORAGE_KEYS.PRIMARY_CURRENCY, primaryCurrency); }, [primaryCurrency]);
   useEffect(() => { saveToStorage(STORAGE_KEYS.SECONDARY_CURRENCY, secondaryCurrency); }, [secondaryCurrency]);
+  useEffect(() => { saveToStorage(STORAGE_KEYS.LANGUAGE, language); }, [language]);
 
   // Theme
   useEffect(() => {
@@ -165,22 +171,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const setTheme = useCallback((t: ThemeMode) => setThemeState(t), []);
   const setThemeColor = useCallback((c: string) => setThemeColorState(c), []);
-  const setPrimaryCurrency = useCallback((c: string) => {
-    setPrimaryCurrencyState(c);
-  }, []);
-  const setSecondaryCurrency = useCallback((c: string) => {
-    setSecondaryCurrencyState(c);
-  }, []);
+  const setPrimaryCurrency = useCallback((c: string) => setPrimaryCurrencyState(c), []);
+  const setSecondaryCurrency = useCallback((c: string) => setSecondaryCurrencyState(c), []);
+  const setLanguage = useCallback((l: Language) => setLanguageState(l), []);
 
   return (
     <AppContext.Provider value={{
       transactions, wallets, categories, platforms, theme, themeColor,
-      primaryCurrency, secondaryCurrency, latestRate, rateLoading,
+      primaryCurrency, secondaryCurrency, latestRate, rateLoading, language,
       addTransaction, updateTransaction, deleteTransaction,
       addWallet, updateWallet, deleteWallet, reorderWallets,
       addCategory, updateCategory, deleteCategory, reorderCategories,
       addPlatform, updatePlatform, deletePlatform,
-      setTheme, setThemeColor, setPrimaryCurrency, setSecondaryCurrency, refreshRates,
+      setTheme, setThemeColor, setPrimaryCurrency, setSecondaryCurrency, setLanguage, refreshRates,
     }}>
       {children}
     </AppContext.Provider>

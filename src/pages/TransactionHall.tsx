@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
+import { translations, getCategoryDisplayName, getPlatformDisplayName, formatDateHeader } from '@/lib/i18n';
 import { getCurrencySymbol } from '@/lib/currencies';
 import { Trash2, X, ChevronDown } from 'lucide-react';
 import AddTransactionModal from '@/components/AddTransactionModal';
@@ -8,8 +9,8 @@ import CategoryIcon from '@/components/CategoryIcon';
 type Filter = 'all' | 'expense' | 'income';
 
 export default function TransactionHall() {
-  const { transactions, categories, platforms, wallets } = useApp();
-  const { deleteTransaction } = useApp();
+  const { transactions, categories, platforms, wallets, deleteTransaction, language } = useApp();
+  const lang = translations[language];
   const [filter, setFilter] = useState<Filter>('all');
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
@@ -27,22 +28,23 @@ export default function TransactionHall() {
   const getPlatform = (id: string) => platforms.find(p => p.id === id);
   const getWallet = (id: string) => wallets.find(w => w.id === id);
 
-  // Group by date
+  // Group by date (extract date portion from datetime)
   const grouped: Record<string, typeof filtered> = {};
   for (const t of filtered) {
-    if (!grouped[t.date]) grouped[t.date] = [];
-    grouped[t.date].push(t);
+    const dateOnly = t.date.slice(0, 10);
+    if (!grouped[dateOnly]) grouped[dateOnly] = [];
+    grouped[dateOnly].push(t);
   }
 
   const filters: { key: Filter; label: string }[] = [
-    { key: 'all', label: '所有记录' },
-    { key: 'expense', label: '仅消费' },
-    { key: 'income', label: '仅入账' },
+    { key: 'all', label: lang.filterAll },
+    { key: 'expense', label: lang.filterExpense },
+    { key: 'income', label: lang.filterIncome },
   ];
 
   return (
     <div className="max-w-2xl mx-auto">
-      <h2 className="text-2xl font-bold text-foreground mb-5">明细大厅</h2>
+      <h2 className="text-2xl font-bold text-foreground mb-5">{lang.navTransactions}</h2>
 
       {/* Filters */}
       <div className="flex gap-2 mb-5 flex-wrap">
@@ -66,10 +68,10 @@ export default function TransactionHall() {
           {selectedCategory ? (
             <>
               <CategoryIcon icon={selectedCategory.icon} color={selectedCategoryId ? 'currentColor' : selectedCategory.color} size={14} />
-              {selectedCategory.name}
+              {getCategoryDisplayName(language, selectedCategory.id, selectedCategory.name)}
             </>
           ) : (
-            <>选择分类 <ChevronDown className="w-3.5 h-3.5" /></>
+            <>{lang.filterCategory} <ChevronDown className="w-3.5 h-3.5" /></>
           )}
         </button>
       </div>
@@ -83,7 +85,7 @@ export default function TransactionHall() {
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-base font-semibold text-foreground">选择分类</h3>
+              <h3 className="text-base font-semibold text-foreground">{lang.filterCategory}</h3>
               <button onClick={() => setShowCategoryPicker(false)} className="p-1.5 rounded-xl hover:bg-secondary transition-colors">
                 <X className="w-5 h-5 text-muted-foreground" />
               </button>
@@ -103,7 +105,7 @@ export default function TransactionHall() {
                   >
                     <CategoryIcon icon={c.icon} color={c.color} size={18} />
                   </div>
-                  <span className="text-sm font-medium text-foreground">{c.name}</span>
+                  <span className="text-sm font-medium text-foreground">{getCategoryDisplayName(language, c.id, c.name)}</span>
                 </button>
               ))}
             </div>
@@ -114,19 +116,20 @@ export default function TransactionHall() {
       {/* Transaction List */}
       {Object.keys(grouped).length === 0 && (
         <div className="text-center py-20 text-muted-foreground">
-          <p className="text-lg">暂无记录</p>
-          <p className="text-sm mt-1">点击右下角 + 按钮添加第一条记录</p>
+          <p className="text-lg">{lang.noRecords}</p>
+          <p className="text-sm mt-1">{lang.noRecordsHint}</p>
         </div>
       )}
 
       {Object.entries(grouped).map(([date, txs]) => (
         <div key={date} className="mb-5">
-          <div className="text-sm text-muted-foreground mb-2 px-1">{date}</div>
+          <div className="text-sm text-muted-foreground mb-2 px-1">{formatDateHeader(language, date)}</div>
           <div className="space-y-2">
             {txs.map(t => {
               const cat = getCategory(t.category);
               const plat = getPlatform(t.platformId);
               const wallet = getWallet(t.walletId);
+              const timeStr = t.date.length > 10 ? t.date.slice(11, 16) : '';
               return (
                 <div
                   key={t.id}
@@ -136,7 +139,6 @@ export default function TransactionHall() {
                   onMouseLeave={() => setHoveredId(null)}
                 >
                   <div className="flex items-center gap-3">
-                    {/* Category icon */}
                     <div
                       className="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0"
                       style={{ backgroundColor: (cat?.color || '#94a3b8') + '20' }}
@@ -144,28 +146,27 @@ export default function TransactionHall() {
                       <CategoryIcon icon={cat?.icon || (t.type === 'income' ? '💰' : '📦')} color={cat?.color} size={20} />
                     </div>
 
-                    {/* Info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-medium text-foreground">
-                          {t.type === 'income' ? '入账' : cat?.name || t.category}
+                          {t.type === 'income' ? lang.income : getCategoryDisplayName(language, t.category, cat?.name || t.category)}
                         </span>
                         {plat && (
                           <span
                             className="text-[10px] px-1.5 py-0.5 rounded-lg text-primary-foreground"
                             style={{ backgroundColor: plat.color }}
                           >
-                            {plat.name}
+                            {getPlatformDisplayName(language, plat.id, plat.name)}
                           </span>
                         )}
                       </div>
                       <div className="text-xs text-muted-foreground mt-0.5 flex gap-2">
+                        {timeStr && <span>{timeStr}</span>}
                         {wallet && <span>{wallet.name}</span>}
                         {t.note && <span>· {t.note}</span>}
                       </div>
                     </div>
 
-                    {/* Amount */}
                     <div className="text-right flex-shrink-0">
                       <span className={`text-sm font-semibold ${t.type === 'income' ? 'text-income' : 'text-expense'}`}>
                         {t.type === 'income' ? '+' : '-'}{getCurrencySymbol(t.currency)}{t.amount.toFixed(2)}
@@ -173,7 +174,6 @@ export default function TransactionHall() {
                       <span className="text-[10px] ml-1 text-muted-foreground">{t.currency}</span>
                     </div>
 
-                    {/* Delete button on hover */}
                     {hoveredId === t.id && (
                       <button
                         onClick={e => { e.stopPropagation(); deleteTransaction(t.id); }}

@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useApp } from '@/contexts/AppContext';
+import { translations, getCategoryDisplayName } from '@/lib/i18n';
 import type { Transaction } from '@/types';
 import { getCurrencySymbol } from '@/lib/currencies';
 import CategoryIcon from '@/components/CategoryIcon';
+import MobileTimePicker from '@/components/MobileTimePicker';
 
 interface Props {
   open: boolean;
@@ -11,7 +13,12 @@ interface Props {
 }
 
 export default function AddTransactionModal({ open, onClose, editTransaction }: Props) {
-  const { wallets, categories, platforms, primaryCurrency, secondaryCurrency, addTransaction, updateTransaction } = useApp();
+  const { wallets, categories, platforms, primaryCurrency, secondaryCurrency, addTransaction, updateTransaction, language } = useApp();
+  const lang = translations[language];
+
+  const isTouchDevice = useMemo(() =>
+    typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0),
+  []);
 
   const [type, setType] = useState<'expense' | 'income'>('expense');
   const [amount, setAmount] = useState('');
@@ -21,6 +28,8 @@ export default function AddTransactionModal({ open, onClose, editTransaction }: 
   const [category, setCategory] = useState('');
   const [date, setDate] = useState(new Date().toISOString().slice(0, 16));
   const [note, setNote] = useState('');
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const amountRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (editTransaction) {
@@ -44,10 +53,22 @@ export default function AddTransactionModal({ open, onClose, editTransaction }: 
     }
   }, [editTransaction, open, primaryCurrency, wallets, platforms]);
 
+  // Auto-focus amount input on mobile when adding new
+  useEffect(() => {
+    if (open && !editTransaction && amountRef.current) {
+      setTimeout(() => amountRef.current?.focus(), 350);
+    }
+  }, [open, editTransaction]);
+
+  const displayDate = useMemo(() => {
+    if (!date) return '';
+    const [d, t] = date.split('T');
+    return `${d}  ${t || '00:00'}`;
+  }, [date]);
+
   if (!open) return null;
 
   const handleAmountChange = (val: string) => {
-    // Prevent negative numbers
     const num = parseFloat(val);
     if (val !== '' && num < 0) return;
     setAmount(val);
@@ -74,6 +95,12 @@ export default function AddTransactionModal({ open, onClose, editTransaction }: 
   const sortedCategories = [...categories].sort((a, b) => a.order - b.order);
   const currencies = [primaryCurrency, secondaryCurrency];
 
+  const displayDate = useMemo(() => {
+    if (!date) return '';
+    const [d, t] = date.split('T');
+    return `${d}  ${t || '00:00'}`;
+  }, [date]);
+
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" onClick={onClose}>
       <div className="fixed inset-0 bg-foreground/20 backdrop-blur-sm modal-overlay" />
@@ -94,7 +121,7 @@ export default function AddTransactionModal({ open, onClose, editTransaction }: 
                     : 'bg-secondary text-muted-foreground'
                 }`}
               >
-                {t === 'expense' ? '支出' : '入账'}
+                {t === 'expense' ? lang.expense : lang.income}
               </button>
             ))}
           </div>
@@ -113,11 +140,13 @@ export default function AddTransactionModal({ open, onClose, editTransaction }: 
           </div>
         </div>
 
-        {/* Amount - symbol on the left of the number */}
+        {/* Amount */}
         <div className="flex items-center justify-center gap-2 mb-6">
           <span className="text-2xl text-muted-foreground">{getCurrencySymbol(currency)}</span>
           <input
+            ref={amountRef}
             type="number"
+            inputMode="decimal"
             value={amount}
             onChange={e => handleAmountChange(e.target.value)}
             min="0"
@@ -129,7 +158,7 @@ export default function AddTransactionModal({ open, onClose, editTransaction }: 
         {/* Wallet + Platform */}
         <div className="grid grid-cols-2 gap-3 mb-4">
           <div>
-            <label className="text-xs text-muted-foreground mb-1 block">钱包</label>
+            <label className="text-xs text-muted-foreground mb-1 block">{lang.wallet}</label>
             <select
               value={walletId}
               onChange={e => setWalletId(e.target.value)}
@@ -141,7 +170,7 @@ export default function AddTransactionModal({ open, onClose, editTransaction }: 
             </select>
           </div>
           <div>
-            <label className="text-xs text-muted-foreground mb-1 block">平台</label>
+            <label className="text-xs text-muted-foreground mb-1 block">{lang.platform}</label>
             <select
               value={platformId}
               onChange={e => setPlatformId(e.target.value)}
@@ -157,7 +186,7 @@ export default function AddTransactionModal({ open, onClose, editTransaction }: 
         {/* Categories grid (expense only) */}
         {type === 'expense' && (
           <div className="mb-4">
-            <label className="text-xs text-muted-foreground mb-2 block">分类</label>
+            <label className="text-xs text-muted-foreground mb-2 block">{lang.category}</label>
             <div className="grid grid-cols-5 gap-2">
               {sortedCategories.map(c => (
                 <button
@@ -166,7 +195,7 @@ export default function AddTransactionModal({ open, onClose, editTransaction }: 
                   className={`category-icon-btn ${category === c.id ? 'selected' : ''}`}
                 >
                   <CategoryIcon icon={c.icon} color={c.color} size={22} />
-                  <span className="text-[10px] text-muted-foreground">{c.name}</span>
+                  <span className="text-[10px] text-muted-foreground">{getCategoryDisplayName(language, c.id, c.name)}</span>
                 </button>
               ))}
             </div>
@@ -174,23 +203,32 @@ export default function AddTransactionModal({ open, onClose, editTransaction }: 
         )}
 
         {/* Date + Note */}
-         <div className="grid grid-cols-2 gap-3 mb-6">
-           <div>
-             <label className="text-xs text-muted-foreground mb-1 block">时间</label>
-             <input
-               type="datetime-local"
-               value={date}
-               onChange={e => setDate(e.target.value)}
-               className="w-full bg-secondary text-foreground rounded-xl px-3 py-2.5 text-sm outline-none"
-             />
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">{lang.time}</label>
+            {isTouchDevice ? (
+              <button
+                onClick={() => setShowTimePicker(true)}
+                className="w-full bg-secondary text-foreground rounded-xl px-3 py-2.5 text-sm text-left outline-none"
+              >
+                {displayDate}
+              </button>
+            ) : (
+              <input
+                type="datetime-local"
+                value={date}
+                onChange={e => setDate(e.target.value)}
+                className="w-full bg-secondary text-foreground rounded-xl px-3 py-2.5 text-sm outline-none"
+              />
+            )}
           </div>
           <div>
-            <label className="text-xs text-muted-foreground mb-1 block">备注</label>
+            <label className="text-xs text-muted-foreground mb-1 block">{lang.note}</label>
             <input
               type="text"
               value={note}
               onChange={e => setNote(e.target.value)}
-              placeholder="添加备注..."
+              placeholder={lang.notePlaceholder}
               className="w-full bg-secondary text-foreground rounded-xl px-3 py-2.5 text-sm outline-none placeholder:text-muted-foreground"
             />
           </div>
@@ -201,9 +239,17 @@ export default function AddTransactionModal({ open, onClose, editTransaction }: 
           onClick={handleSubmit}
           className="w-full gradient-primary text-primary-foreground py-3.5 rounded-2xl font-semibold accent-glow transition-all duration-200 hover:opacity-90"
         >
-          {editTransaction ? '保存修改' : '添加记录'}
+          {editTransaction ? lang.saveChanges : lang.addRecord}
         </button>
       </div>
+
+      {showTimePicker && (
+        <MobileTimePicker
+          value={date}
+          onChange={setDate}
+          onClose={() => setShowTimePicker(false)}
+        />
+      )}
     </div>
   );
 }
