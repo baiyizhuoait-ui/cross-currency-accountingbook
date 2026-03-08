@@ -60,6 +60,12 @@ export default function AddTransactionModal({ open, onClose, editTransaction }: 
     }
   }, [open, editTransaction]);
 
+  const displayDate = useMemo(() => {
+    if (!date) return '';
+    const [d, t] = date.split('T');
+    return `${d}  ${t || '00:00'}`;
+  }, [date]);
+
   if (!open) return null;
 
   const handleAmountChange = (val: string) => {
