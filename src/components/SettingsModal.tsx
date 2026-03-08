@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
+import { translations, getCategoryDisplayName, getCurrencyDisplayName } from '@/lib/i18n';
 import CategoryIcon from '@/components/CategoryIcon';
 import { SUPPORTED_CURRENCIES } from '@/lib/currencies';
-import { Sun, Moon, X, Plus, Trash2, ArrowUp, ArrowDown, GripVertical, Check, ChevronRight, Search } from 'lucide-react';
+import { Sun, Moon, X, Plus, Trash2, ArrowUp, ArrowDown, GripVertical, Check, ChevronRight, Search, Globe } from 'lucide-react';
 import { toast } from 'sonner';
 import AddCategoryModal from './AddCategoryModal';
 import AddPlatformModal from './AddPlatformModal';
@@ -17,6 +18,7 @@ type CurrencyPickerTarget = 'primary' | 'secondary' | null;
 
 export default function SettingsModal({ open, onClose }: Props) {
   const app = useApp();
+  const lang = translations[app.language];
   const [tab, setTab] = useState<SettingsTab>('general');
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [showAddPlatform, setShowAddPlatform] = useState(false);
@@ -26,9 +28,9 @@ export default function SettingsModal({ open, onClose }: Props) {
   if (!open) return null;
 
   const tabs: { key: SettingsTab; label: string }[] = [
-    { key: 'general', label: '常规' },
-    { key: 'platforms', label: '平台管理' },
-    { key: 'categories', label: '分类管理' },
+    { key: 'general', label: lang.tabGeneral },
+    { key: 'platforms', label: lang.tabPlatforms },
+    { key: 'categories', label: lang.tabCategories },
   ];
 
   const moveCategory = (idx: number, dir: -1 | 1) => {
@@ -41,6 +43,23 @@ export default function SettingsModal({ open, onClose }: Props) {
     app.reorderCategories(sorted);
   };
 
+  const themeColors = [
+    { key: 'blue', light: '221 83% 53%', dark: '217 91% 60%' },
+    { key: 'rose', light: '346 77% 50%', dark: '346 77% 60%' },
+    { key: 'green', light: '160 84% 39%', dark: '160 84% 45%' },
+    { key: 'violet', light: '263 70% 50%', dark: '263 70% 60%' },
+    { key: 'amber', light: '38 92% 50%', dark: '38 92% 55%' },
+    { key: 'teal', light: '183 74% 40%', dark: '183 74% 50%' },
+  ];
+
+  const colorNameKey = (key: string) => {
+    const map: Record<string, string> = {
+      blue: lang.colorBlue, rose: lang.colorRose, green: lang.colorGreen,
+      violet: lang.colorViolet, amber: lang.colorAmber, teal: lang.colorTeal,
+    };
+    return map[key] || key;
+  };
+
   return (
     <>
       <div className="fixed inset-0 z-50 flex items-center justify-center" onClick={onClose}>
@@ -50,7 +69,7 @@ export default function SettingsModal({ open, onClose }: Props) {
           onClick={e => e.stopPropagation()}
         >
           <div className="flex items-center justify-between mb-5">
-            <h2 className="text-lg font-bold text-foreground">设置中心</h2>
+            <h2 className="text-lg font-bold text-foreground">{lang.settingsTitle}</h2>
             <button onClick={onClose} className="p-1.5 rounded-xl hover:bg-secondary transition-colors">
               <X className="w-5 h-5 text-muted-foreground" />
             </button>
@@ -75,9 +94,9 @@ export default function SettingsModal({ open, onClose }: Props) {
           {tab === 'general' && (
             <div className="space-y-5">
               <div>
-                <label className="text-sm font-medium text-foreground mb-2 block">外观模式</label>
+                <label className="text-sm font-medium text-foreground mb-2 block">{lang.appearance}</label>
                 <div className="flex gap-2">
-                  {([['light', '浅色', Sun], ['dark', '深色', Moon]] as const).map(([mode, label, Icon]) => (
+                  {([['light', lang.lightMode, Sun], ['dark', lang.darkMode, Moon]] as const).map(([mode, label, Icon]) => (
                     <button
                       key={mode}
                       onClick={() => app.setTheme(mode)}
@@ -93,16 +112,9 @@ export default function SettingsModal({ open, onClose }: Props) {
               </div>
 
               <div>
-                <label className="text-sm font-medium text-foreground mb-2 block">主题色</label>
+                <label className="text-sm font-medium text-foreground mb-2 block">{lang.themeColor}</label>
                 <div className="flex gap-2.5 flex-wrap">
-                  {([
-                    { key: 'blue', label: '蓝色', light: '221 83% 53%', dark: '217 91% 60%' },
-                    { key: 'rose', label: '玫红', light: '346 77% 50%', dark: '346 77% 60%' },
-                    { key: 'green', label: '绿色', light: '160 84% 39%', dark: '160 84% 45%' },
-                    { key: 'violet', label: '紫色', light: '263 70% 50%', dark: '263 70% 60%' },
-                    { key: 'amber', label: '琥珀', light: '38 92% 50%', dark: '38 92% 55%' },
-                    { key: 'teal', label: '青色', light: '183 74% 40%', dark: '183 74% 50%' },
-                  ] as const).map(c => {
+                  {themeColors.map(c => {
                     const isActive = app.themeColor === c.key;
                     const colorHsl = app.theme === 'dark' ? c.dark : c.light;
                     return (
@@ -113,37 +125,56 @@ export default function SettingsModal({ open, onClose }: Props) {
                           isActive ? 'ring-2 ring-offset-2 ring-offset-background' : 'hover:scale-105'
                         }`}
                         style={{ ['--tw-ring-color' as string]: `hsl(${colorHsl})` }}
-                        title={c.label}
+                        title={colorNameKey(c.key)}
                       >
                         <div
                           className="w-8 h-8 rounded-full shadow-sm"
                           style={{ background: `hsl(${colorHsl})` }}
                         />
-                        <span className="text-[10px] text-muted-foreground">{c.label}</span>
+                        <span className="text-[10px] text-muted-foreground">{colorNameKey(c.key)}</span>
                       </button>
                     );
                   })}
                 </div>
               </div>
 
+              {/* Language toggle */}
               <div>
-                <label className="text-sm font-medium text-foreground mb-2 block">主要货币</label>
+                <label className="text-sm font-medium text-foreground mb-2 block">{lang.languageLabel}</label>
+                <div className="flex gap-2">
+                  {([['zh', lang.langZh], ['en', lang.langEn]] as const).map(([code, label]) => (
+                    <button
+                      key={code}
+                      onClick={() => app.setLanguage(code as 'zh' | 'en')}
+                      className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm transition-all ${
+                        app.language === code ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'
+                      }`}
+                    >
+                      <Globe className="w-4 h-4" />
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-foreground mb-2 block">{lang.primaryCurrency}</label>
                 <button
                   onClick={() => { setCurrencyPicker('primary'); setCurrencySearch(''); }}
                   className="w-full flex items-center justify-between bg-secondary text-foreground rounded-2xl px-4 py-3 text-sm hover:bg-secondary/80 transition-colors"
                 >
-                  <span>{SUPPORTED_CURRENCIES.find(c => c.code === app.primaryCurrency)?.symbol} {app.primaryCurrency} - {SUPPORTED_CURRENCIES.find(c => c.code === app.primaryCurrency)?.nameZh}</span>
+                  <span>{SUPPORTED_CURRENCIES.find(c => c.code === app.primaryCurrency)?.symbol} {app.primaryCurrency} - {getCurrencyDisplayName(app.language, app.primaryCurrency, SUPPORTED_CURRENCIES.find(c => c.code === app.primaryCurrency)?.nameZh || '', SUPPORTED_CURRENCIES.find(c => c.code === app.primaryCurrency)?.name || '')}</span>
                   <ChevronRight className="w-4 h-4 text-muted-foreground" />
                 </button>
               </div>
 
               <div>
-                <label className="text-sm font-medium text-foreground mb-2 block">次要货币</label>
+                <label className="text-sm font-medium text-foreground mb-2 block">{lang.secondaryCurrency}</label>
                 <button
                   onClick={() => { setCurrencyPicker('secondary'); setCurrencySearch(''); }}
                   className="w-full flex items-center justify-between bg-secondary text-foreground rounded-2xl px-4 py-3 text-sm hover:bg-secondary/80 transition-colors"
                 >
-                  <span>{SUPPORTED_CURRENCIES.find(c => c.code === app.secondaryCurrency)?.symbol} {app.secondaryCurrency} - {SUPPORTED_CURRENCIES.find(c => c.code === app.secondaryCurrency)?.nameZh}</span>
+                  <span>{SUPPORTED_CURRENCIES.find(c => c.code === app.secondaryCurrency)?.symbol} {app.secondaryCurrency} - {getCurrencyDisplayName(app.language, app.secondaryCurrency, SUPPORTED_CURRENCIES.find(c => c.code === app.secondaryCurrency)?.nameZh || '', SUPPORTED_CURRENCIES.find(c => c.code === app.secondaryCurrency)?.name || '')}</span>
                   <ChevronRight className="w-4 h-4 text-muted-foreground" />
                 </button>
               </div>
@@ -167,7 +198,7 @@ export default function SettingsModal({ open, onClose }: Props) {
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border-2 border-dashed border-muted text-muted-foreground hover:border-primary hover:text-primary transition-all duration-200"
               >
                 <Plus className="w-4 h-4" />
-                <span className="text-sm font-medium">添加平台</span>
+                <span className="text-sm font-medium">{lang.addPlatformBtn}</span>
               </button>
             </div>
           )}
@@ -179,7 +210,7 @@ export default function SettingsModal({ open, onClose }: Props) {
                 <div key={c.id} className="flex items-center gap-2 bg-secondary rounded-2xl p-3">
                   <GripVertical className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                   <CategoryIcon icon={c.icon} color={c.color} size={20} />
-                  <span className="flex-1 text-sm text-foreground">{c.name}</span>
+                  <span className="flex-1 text-sm text-foreground">{getCategoryDisplayName(app.language, c.id, c.name)}</span>
                   <div className="w-3 h-3 rounded-full" style={{ backgroundColor: c.color }} />
                   <button onClick={() => moveCategory(idx, -1)} className="text-muted-foreground hover:text-foreground">
                     <ArrowUp className="w-3.5 h-3.5" />
@@ -199,14 +230,14 @@ export default function SettingsModal({ open, onClose }: Props) {
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border-2 border-dashed border-muted text-muted-foreground hover:border-primary hover:text-primary transition-all duration-200"
               >
                 <Plus className="w-4 h-4" />
-                <span className="text-sm font-medium">添加分类</span>
+                <span className="text-sm font-medium">{lang.addCategoryBtn}</span>
               </button>
             </div>
           )}
         </div>
       </div>
 
-      {/* iOS-style Currency Picker Overlay */}
+      {/* Currency Picker Overlay */}
       {currencyPicker && (
         <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center" onClick={() => setCurrencyPicker(null)}>
           <div className="fixed inset-0 bg-foreground/30 backdrop-blur-sm modal-overlay" />
@@ -216,7 +247,7 @@ export default function SettingsModal({ open, onClose }: Props) {
           >
             <div className="flex items-center justify-between px-5 pt-5 pb-3">
               <h3 className="text-base font-semibold text-foreground">
-                {currencyPicker === 'primary' ? '选择主要货币' : '选择次要货币'}
+                {currencyPicker === 'primary' ? lang.selectPrimaryCurrency : lang.selectSecondaryCurrency}
               </h3>
               <button onClick={() => setCurrencyPicker(null)} className="p-1.5 rounded-xl hover:bg-secondary transition-colors">
                 <X className="w-5 h-5 text-muted-foreground" />
@@ -229,7 +260,7 @@ export default function SettingsModal({ open, onClose }: Props) {
                   type="text"
                   value={currencySearch}
                   onChange={e => setCurrencySearch(e.target.value)}
-                  placeholder="搜索货币..."
+                  placeholder={lang.searchCurrency}
                   className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
                 />
               </div>
@@ -251,7 +282,7 @@ export default function SettingsModal({ open, onClose }: Props) {
                         onClick={() => {
                           const otherValue = currencyPicker === 'primary' ? app.secondaryCurrency : app.primaryCurrency;
                           if (c.code === otherValue) {
-                            toast.error('主要货币与次要货币不能相同', { description: `${c.nameZh} (${c.code}) 已被设为${currencyPicker === 'primary' ? '次要' : '主要'}货币` });
+                            toast.error(lang.currencySameError);
                             return;
                           }
                           if (currencyPicker === 'primary') {
@@ -268,7 +299,7 @@ export default function SettingsModal({ open, onClose }: Props) {
                       >
                         <span className="w-8 text-center text-lg">{c.symbol}</span>
                         <div className="flex-1 min-w-0">
-                          <span className="text-sm font-medium text-foreground">{c.nameZh}</span>
+                          <span className="text-sm font-medium text-foreground">{getCurrencyDisplayName(app.language, c.code, c.nameZh, c.name)}</span>
                           <span className="text-xs text-muted-foreground ml-2">{c.code}</span>
                         </div>
                         {isSelected && <Check className="w-4.5 h-4.5 text-primary flex-shrink-0" />}

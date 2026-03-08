@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
+import { translations } from '@/lib/i18n';
 import { getCurrencySymbol } from '@/lib/currencies';
 import { Plus, ChevronLeft, ChevronRight, Trash2, Settings } from 'lucide-react';
 
@@ -11,7 +12,8 @@ const WALLET_COLORS = [
 ];
 
 export default function MyAssets() {
-  const { wallets, transactions, primaryCurrency, secondaryCurrency, latestRate, addWallet, deleteWallet, reorderWallets } = useApp();
+  const { wallets, transactions, primaryCurrency, secondaryCurrency, latestRate, addWallet, deleteWallet, reorderWallets, language } = useApp();
+  const lang = translations[language];
   const [displayCurrency, setDisplayCurrency] = useState(primaryCurrency);
   const [managing, setManaging] = useState(false);
   const [newWallet, setNewWallet] = useState({ name: '', currency: primaryCurrency, color: '#3b82f6', balance: '' });
@@ -73,11 +75,11 @@ export default function MyAssets() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <h2 className="text-2xl font-bold text-foreground mb-5">我的资产</h2>
+      <h2 className="text-2xl font-bold text-foreground mb-5">{lang.navAssets}</h2>
 
       {/* Total Assets Card */}
       <div className="gradient-primary rounded-3xl p-6 mb-6 accent-glow-lg">
-        <div className="text-primary-foreground/70 text-sm mb-1">净资产总额</div>
+        <div className="text-primary-foreground/70 text-sm mb-1">{lang.netAssets}</div>
         <div className="text-primary-foreground text-3xl font-bold mb-3">
           {getCurrencySymbol(displayCurrency)}{totalAssets.toFixed(2)}
         </div>
@@ -100,7 +102,7 @@ export default function MyAssets() {
 
       {/* Manage button */}
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-foreground">我的钱包</h3>
+        <h3 className="text-lg font-semibold text-foreground">{lang.myWallets}</h3>
         <button
           onClick={() => setManaging(!managing)}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
@@ -108,7 +110,7 @@ export default function MyAssets() {
           }`}
         >
           <Settings className="w-3.5 h-3.5" />
-          {managing ? '完成' : '管理'}
+          {managing ? lang.done : lang.manage}
         </button>
       </div>
 
@@ -153,21 +155,20 @@ export default function MyAssets() {
           );
         })}
 
-        {/* Create new wallet card */}
         {!showCreate ? (
           <button
             onClick={() => setShowCreate(true)}
             className="border-2 border-dashed border-muted rounded-3xl p-5 flex flex-col items-center justify-center gap-2 text-muted-foreground hover:border-primary hover:text-primary transition-all duration-200 min-h-[120px]"
           >
             <Plus className="w-6 h-6" />
-            <span className="text-sm">创建新钱包</span>
+            <span className="text-sm">{lang.createWallet}</span>
           </button>
         ) : (
           <div className="glass-card space-y-3">
             <input
               value={newWallet.name}
               onChange={e => setNewWallet({ ...newWallet, name: e.target.value })}
-              placeholder="钱包名称"
+              placeholder={lang.walletName}
               className="w-full bg-secondary text-foreground rounded-xl px-3 py-2 text-sm outline-none placeholder:text-muted-foreground"
             />
             <select
@@ -179,9 +180,8 @@ export default function MyAssets() {
                 <option key={c} value={c}>{c}</option>
               ))}
             </select>
-            {/* Color selection */}
             <div>
-              <label className="text-xs text-muted-foreground mb-1.5 block">选择颜色</label>
+              <label className="text-xs text-muted-foreground mb-1.5 block">{lang.chooseColor}</label>
               <div className="flex flex-wrap gap-1.5">
                 {WALLET_COLORS.map(c => (
                   <button
@@ -199,15 +199,15 @@ export default function MyAssets() {
               type="number"
               value={newWallet.balance}
               onChange={e => setNewWallet({ ...newWallet, balance: e.target.value })}
-              placeholder="初始余额"
+              placeholder={lang.initialBalance}
               className="w-full bg-secondary text-foreground rounded-xl px-3 py-2 text-sm outline-none placeholder:text-muted-foreground"
             />
             <div className="flex gap-2">
               <button onClick={() => setShowCreate(false)} className="flex-1 py-2 rounded-xl bg-secondary text-muted-foreground text-sm">
-                取消
+                {lang.cancel}
               </button>
               <button onClick={handleCreateWallet} className="flex-1 py-2 rounded-xl gradient-primary text-primary-foreground text-sm font-medium">
-                创建
+                {lang.create}
               </button>
             </div>
           </div>

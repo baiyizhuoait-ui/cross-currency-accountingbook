@@ -1,14 +1,16 @@
 import { useState, useMemo } from 'react';
 import { useApp } from '@/contexts/AppContext';
+import { translations, getCategoryDisplayName } from '@/lib/i18n';
 import { getCurrencySymbol } from '@/lib/currencies';
-import { getHistoricalRateForChart, getLatestCachedRate, getCachedHistoricalDates } from '@/lib/exchangeRates';
+import { getHistoricalRateForChart, getCachedHistoricalDates } from '@/lib/exchangeRates';
 import { ArrowRightLeft } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 type Period = '5d' | '1m' | '3m' | '1y';
 
 export default function DataDashboard() {
-  const { transactions, categories, wallets, platforms, primaryCurrency, secondaryCurrency, latestRate } = useApp();
+  const { transactions, categories, wallets, platforms, primaryCurrency, secondaryCurrency, latestRate, language } = useApp();
+  const lang = translations[language];
   const [reversed, setReversed] = useState(false);
   const [period, setPeriod] = useState<Period>('1m');
   const [filterWallet, setFilterWallet] = useState('all');
@@ -18,7 +20,6 @@ export default function DataDashboard() {
   const toCur = reversed ? primaryCurrency : secondaryCurrency;
   const currentRate = reversed ? (latestRate ? 1 / latestRate : 1) : latestRate;
 
-  // Rate chart data
   const chartData = useMemo(() => {
     const dates = getCachedHistoricalDates();
     const now = new Date();
@@ -39,7 +40,6 @@ export default function DataDashboard() {
       .filter(Boolean) as { date: string; rate: number }[];
   }, [period, reversed, primaryCurrency, secondaryCurrency]);
 
-  // Expense pie data (exclude income and transfer)
   const pieData = useMemo(() => {
     const filtered = transactions.filter(t => {
       if (t.type === 'income' || t.category === 'transfer') return false;
@@ -50,7 +50,6 @@ export default function DataDashboard() {
 
     const catTotals: Record<string, number> = {};
     for (const tx of filtered) {
-      // Convert all to primaryCurrency using latest rate
       let amount = tx.amount;
       if (tx.currency !== primaryCurrency) {
         amount /= latestRate || 1;
@@ -61,21 +60,26 @@ export default function DataDashboard() {
     return Object.entries(catTotals)
       .map(([catId, value]) => {
         const cat = categories.find(c => c.id === catId);
-        return { name: cat?.name || catId, value: parseFloat(value.toFixed(2)), color: cat?.color || '#94a3b8', icon: cat?.icon || '📦' };
+        return {
+          name: getCategoryDisplayName(language, catId, cat?.name || catId),
+          value: parseFloat(value.toFixed(2)),
+          color: cat?.color || '#94a3b8',
+          icon: cat?.icon || '📦',
+        };
       })
       .sort((a, b) => b.value - a.value);
-  }, [transactions, categories, filterWallet, filterPlatform, primaryCurrency, latestRate]);
+  }, [transactions, categories, filterWallet, filterPlatform, primaryCurrency, latestRate, language]);
 
   const periods: { key: Period; label: string }[] = [
-    { key: '5d', label: '5天' },
-    { key: '1m', label: '一月' },
-    { key: '3m', label: '三月' },
-    { key: '1y', label: '一年' },
+    { key: '5d', label: lang.period5d },
+    { key: '1m', label: lang.period1m },
+    { key: '3m', label: lang.period3m },
+    { key: '1y', label: lang.period1y },
   ];
 
   return (
     <div className="max-w-3xl mx-auto">
-      <h2 className="text-2xl font-bold text-foreground mb-5">数据看板</h2>
+      <h2 className="text-2xl font-bold text-foreground mb-5">{lang.navDashboard}</h2>
 
       {/* Exchange Rate Chart */}
       <div className="glass-card mb-5">
@@ -92,7 +96,6 @@ export default function DataDashboard() {
           </button>
         </div>
 
-        {/* Period filters */}
         <div className="flex gap-2 mb-4">
           {periods.map(p => (
             <button
@@ -125,22 +128,21 @@ export default function DataDashboard() {
             </LineChart>
           </ResponsiveContainer>
         ) : (
-          <div className="text-center py-10 text-muted-foreground text-sm">暂无汇率数据，请等待加载...</div>
+          <div className="text-center py-10 text-muted-foreground text-sm">{lang.rateLoading}</div>
         )}
       </div>
 
       {/* Expense Category Pie */}
       <div className="glass-card">
-        <h3 className="text-lg font-semibold text-foreground mb-4">总消费分类汇总</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-4">{lang.expenseSummary}</h3>
 
-        {/* Filters */}
         <div className="flex gap-3 mb-4">
           <select
             value={filterWallet}
             onChange={e => setFilterWallet(e.target.value)}
             className="bg-secondary text-foreground rounded-xl px-3 py-2 text-sm outline-none flex-1"
           >
-            <option value="all">所有钱包</option>
+            <option value="all">{lang.allWallets}</option>
             {wallets.map(w => (
               <option key={w.id} value={w.id}>{w.name}</option>
             ))}
@@ -150,7 +152,7 @@ export default function DataDashboard() {
             onChange={e => setFilterPlatform(e.target.value)}
             className="bg-secondary text-foreground rounded-xl px-3 py-2 text-sm outline-none flex-1"
           >
-            <option value="all">所有平台</option>
+            <option value="all">{lang.allPlatforms}</option>
             {platforms.map(p => (
               <option key={p.id} value={p.id}>{p.name}</option>
             ))}
@@ -196,7 +198,7 @@ export default function DataDashboard() {
             </div>
           </>
         ) : (
-          <div className="text-center py-10 text-muted-foreground text-sm">暂无消费数据</div>
+          <div className="text-center py-10 text-muted-foreground text-sm">{lang.noExpenseData}</div>
         )}
       </div>
     </div>
