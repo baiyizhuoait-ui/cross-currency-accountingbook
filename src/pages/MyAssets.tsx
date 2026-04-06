@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/hooks/use-app';
 import { translations } from '@/lib/i18n';
 import { getCurrencySymbol } from '@/lib/currencies';
 import { Plus, ChevronLeft, ChevronRight, Trash2, Settings } from 'lucide-react';

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/hooks/use-app';
 import { translations, getCategoryDisplayName } from '@/lib/i18n';
 import type { Transaction } from '@/types';
 import { getCurrencySymbol } from '@/lib/currencies';

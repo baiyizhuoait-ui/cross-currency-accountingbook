@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/hooks/use-app';
 import { translations, getCategoryDisplayName, getCurrencyDisplayName } from '@/lib/i18n';
 import CategoryIcon from '@/components/CategoryIcon';
 import { SUPPORTED_CURRENCIES } from '@/lib/currencies';
