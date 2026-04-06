@@ -107,8 +107,8 @@ export const translations = {
     minuteLabel: '分',
   },
   en: {
-    appName: 'Multi-Currency Ledger',
-    appNameIcon: '💰 Multi-Currency Ledger',
+    appName: 'UniTally',
+    appNameIcon: '💰 UniTally',
     navTransactions: 'Transactions',
     navAssets: 'My Assets',
     navCalendar: 'Calendar',
