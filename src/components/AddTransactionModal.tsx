@@ -95,11 +95,6 @@ export default function AddTransactionModal({ open, onClose, editTransaction }: 
   const sortedCategories = [...categories].sort((a, b) => a.order - b.order);
   const currencies = [primaryCurrency, secondaryCurrency];
 
-  const displayDate = useMemo(() => {
-    if (!date) return '';
-    const [d, t] = date.split('T');
-    return `${d}  ${t || '00:00'}`;
-  }, [date]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" onClick={onClose}>
