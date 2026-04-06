@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/hooks/use-app';
 import { translations, getCategoryDisplayName } from '@/lib/i18n';
 import { getCurrencySymbol } from '@/lib/currencies';
 import { getHistoricalRateForChart, getCachedHistoricalDates } from '@/lib/exchangeRates';

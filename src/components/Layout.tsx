@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { List, Wallet, CalendarDays, BarChart3, Settings } from 'lucide-react';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/hooks/use-app';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { translations } from '@/lib/i18n';
 import SettingsModal from '@/components/SettingsModal';

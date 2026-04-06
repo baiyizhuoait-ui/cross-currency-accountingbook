@@ -1,4 +1,4 @@
-import { useApp } from "@/contexts/AppContext";
+import { useApp } from "@/hooks/use-app";
 import { translations } from "@/lib/i18n";
 
 const NotFound = () => {

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/hooks/use-app';
 import { translations, getCategoryDisplayName, getPlatformDisplayName, formatDateHeader } from '@/lib/i18n';
 import { getCurrencySymbol } from '@/lib/currencies';
 import { Trash2, X, ChevronDown } from 'lucide-react';
