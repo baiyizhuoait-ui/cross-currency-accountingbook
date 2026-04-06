@@ -4,8 +4,8 @@ const EN_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'
 
 export const translations = {
   zh: {
-    appName: '多币种记账本',
-    appNameIcon: '💰 多币种记账本',
+    appName: 'UniTally',
+    appNameIcon: '💰 UniTally',
     navTransactions: '明细大厅',
     navAssets: '我的资产',
     navCalendar: '消费日历',
